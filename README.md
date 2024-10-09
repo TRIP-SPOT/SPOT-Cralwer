@@ -9,6 +9,10 @@
 
    첫줄과 두번째줄만 인식됩니다.
 
+### 예시
+
+![image](https://github.com/user-attachments/assets/39ea7cf6-e3ce-42f7-acfc-f958f1df992b)
+
 ## 주의사항
 
 1. input.csv의 첫줄에 해당하는 작품명이 DB에 존재하지 않으면 오류가 발생합니다. 띄어쓰기가 달라도 발생하니 띄어쓰기를 확인해주세요.
