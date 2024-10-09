@@ -1,6 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
 import csv
+import re
+
+def simplifiyCity(city):
+    simplifiedName = re.sub(r'(군|시|구)$', '', city)
+    return simplifiedName
 
 cities = [
     "서울", "부산", "광주", "대전", "대구", "세종", "울산", "인천",
@@ -84,9 +89,12 @@ def getSpotContentId(촬영지):
     response=requests.get('https://data.visitkorea.or.kr/search.do?keyword='+촬영지)
     soup=BeautifulSoup(response.content,'html.parser')
     try:
-        content=soup.find(id="_searchList").find('tr').find('td').find('dl').find('dd').find('a').get_text()
-        contentId=content.split('resource/')[1]
-        return contentId
+        content=soup.find(id="_searchList").find('tr').find('td').find('dl')
+        title=content.find('dt').get_text().strip().replace('(@ko)','')
+        if title==촬영지:
+            contentId=content.find('dd').find('a').get_text().split('resource/')[1]
+            return contentId
+        return None
     except:
         return None
 
@@ -106,9 +114,10 @@ def getRegionCity(trList):
             address= tr.find_all('td')[1].get_text().strip()
             region=address.split(' ')[0]
             city=address.split(' ')[1]
+            print(city)
             REGION_ENUM=regions.index(region)
             try:
-                CITY_ENUM=cities.index(city)
+                CITY_ENUM=cities.index(simplifiyCity(city))
             except:
                 CITY_ENUM=cities.index(region_Mapper[region])
             finally:
@@ -135,7 +144,7 @@ successList=[]
 for 촬영지 in 촬영지들:
     contentId=getSpotContentId(촬영지)
     if(contentId):
-        print(촬영지,contentId)
+        print(촬영지,contentId, end=" ")
         try:
             spotInfo=getSpotInformation(contentId,촬영지)
             result={"workname":작품명,"workId":workMapper.index(작품명),"lat":spotInfo["lat"], "long":spotInfo["long"], 'contentId':contentId, 'city':spotInfo['city'], 'region':spotInfo["region"]}
@@ -159,6 +168,7 @@ for 촬영지 in 촬영지들:
         except Exception as err:
             print("실패: ",err)
 
+print('\n\n')
 print(작품명,"에 해당하는",len(successList),"개의 촬영지가 업데이트되었습니다.")
 print("아래는 db에 업로드한 촬영지 정보입니다.")
 print("==================================")
