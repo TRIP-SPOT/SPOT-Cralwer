@@ -148,7 +148,10 @@ for 촬영지 in 촬영지들:
             },headers={
                 "Authorization":token
             })
-            successList.append(촬영지)
+            if(response.status_code==200):
+                successList.append(촬영지)
+            else:
+                print("서버 오류가 발생했습니다. 토큰을 확인해주시겠어요?")
 
         except:
             print("실패")
