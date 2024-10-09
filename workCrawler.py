@@ -46,7 +46,7 @@ cities = [
 ]
 
 regions = [
-    "강원도", "경기도", "경상북도", "경상남도", "전라북도", "전라남도", "충청북도", "충청남도", 
+    "강원특별자치도", "경기도", "경상북도", "경상남도", "전라북도", "전라남도", "충청북도", "충청남도", 
     "서울특별시", "인천광역시", "대구광역시", "대전광역시", "세종특별자치시", "부산광역시", "광주광역시", "울산광역시", "제주특별자치도"
 ]
 
@@ -119,13 +119,15 @@ def getRegionCity(trList):
                 
 
 
-def getSpotInformation(contentId):
+def getSpotInformation(contentId,촬영지):
     response=requests.get('https://data.visitkorea.or.kr/page/'+contentId)
     soup=BeautifulSoup(response.content,'html.parser')
     tbody=soup.find(class_="lodList tableLine").find('tbody').find_all('tr')
     lat=getLatitude(tbody)
     long=getLongitude(tbody)
     enums=getRegionCity(tbody)
+    if not lat or not long or not enums:
+        raise Exception(촬영지+"에서 정보를 불러오는데 실패했습니다.")
     return {'lat':lat,'long':long, "region":enums['region'], "city":enums['city']}
 
 successList=[]
@@ -133,10 +135,11 @@ successList=[]
 for 촬영지 in 촬영지들:
     contentId=getSpotContentId(촬영지)
     if(contentId):
-        spotInfo=getSpotInformation(contentId)
-        result={"workname":작품명,"workId":workMapper.index(작품명),"lat":spotInfo["lat"], "long":spotInfo["long"], 'contentId':contentId, 'city':spotInfo['city'], 'region':spotInfo["region"]}
-        
+        print(촬영지,contentId)
         try:
+            spotInfo=getSpotInformation(contentId,촬영지)
+            result={"workname":작품명,"workId":workMapper.index(작품명),"lat":spotInfo["lat"], "long":spotInfo["long"], 'contentId':contentId, 'city':spotInfo['city'], 'region':spotInfo["region"]}
+
             response=requests.post('http://www.spot-setjetter.kro.kr:8080/api/spot',json={
                 'contentId':result['contentId'],
                 'name':촬영지,
@@ -153,8 +156,8 @@ for 촬영지 in 촬영지들:
             else:
                 print("서버 오류가 발생했습니다. 토큰을 확인해주시겠어요?")
 
-        except:
-            print("실패")
+        except Exception as err:
+            print("실패: ",err)
 
 print(작품명,"에 해당하는",len(successList),"개의 촬영지가 업데이트되었습니다.")
 print("아래는 db에 업로드한 촬영지 정보입니다.")
