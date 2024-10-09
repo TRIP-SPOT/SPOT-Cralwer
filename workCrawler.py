@@ -75,7 +75,7 @@ def getWorkName():
         "Authorization":token
     })
 
-    sorted_data = sorted(response.json(), key=lambda x: x['id'], reverse=True)
+    sorted_data = sorted(response.json(), key=lambda x: x['id'])
     return list(map(getWork,sorted_data))
     
 
@@ -140,7 +140,7 @@ def getSpotInformation(contentId,촬영지):
     return {'lat':lat,'long':long, "region":enums['region'], "city":enums['city']}
 
 successList=[]
-
+print(workMapper.index(작품명))
 for 촬영지 in 촬영지들:
     contentId=getSpotContentId(촬영지)
     if(contentId):
