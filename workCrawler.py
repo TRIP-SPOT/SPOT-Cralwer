@@ -137,7 +137,7 @@ for 촬영지 in 촬영지들:
         result={"workname":작품명,"workId":workMapper.index(작품명),"lat":spotInfo["lat"], "long":spotInfo["long"], 'contentId':contentId, 'city':spotInfo['city'], 'region':spotInfo["region"]}
         
         try:
-            response=requests.post('http://www.spot-setjetter.kro.kr:8080/api/spot',data={
+            response=requests.post('http://www.spot-setjetter.kro.kr:8080/api/spot',json={
                 'contentId':result['contentId'],
                 'name':촬영지,
                 'region':result['region'],
