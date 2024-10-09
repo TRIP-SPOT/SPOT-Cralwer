@@ -70,13 +70,15 @@ def getWork(object):
     return object['name']
 
 token=open('env.txt','r').readline()
+
 def getWorkName():
     response=requests.get('http://www.spot-setjetter.kro.kr:8080/api/spot/work',headers={
         "Authorization":token
     })
-
-    sorted_data = sorted(response.json(), key=lambda x: x['id'])
-    return list(map(getWork,sorted_data))
+    workDict={}
+    for o in response.json():
+        workDict[o['name']]=o['id']
+    return workDict
     
 
 [작품명배열, 촬영지들]=csv.reader(open('input.csv','r'))
@@ -140,14 +142,14 @@ def getSpotInformation(contentId,촬영지):
     return {'lat':lat,'long':long, "region":enums['region'], "city":enums['city']}
 
 successList=[]
-print(workMapper.index(작품명))
+print(workMapper[작품명])
 for 촬영지 in 촬영지들:
     contentId=getSpotContentId(촬영지)
     if(contentId):
         print(촬영지,contentId, end=" ")
         try:
             spotInfo=getSpotInformation(contentId,촬영지)
-            result={"workname":작품명,"workId":workMapper.index(작품명),"lat":spotInfo["lat"], "long":spotInfo["long"], 'contentId':contentId, 'city':spotInfo['city'], 'region':spotInfo["region"]}
+            result={"workname":작품명,"workId":workMapper[작품명],"lat":spotInfo["lat"], "long":spotInfo["long"], 'contentId':contentId, 'city':spotInfo['city'], 'region':spotInfo["region"]}
 
             response=requests.post('http://www.spot-setjetter.kro.kr:8080/api/spot',json={
                 'contentId':result['contentId'],
