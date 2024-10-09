@@ -128,6 +128,7 @@ def getSpotInformation(contentId):
     enums=getRegionCity(tbody)
     return {'lat':lat,'long':long, "region":enums['region'], "city":enums['city']}
 
+successList=[]
 
 for 촬영지 in 촬영지들:
     contentId=getSpotContentId(촬영지)
@@ -147,6 +148,13 @@ for 촬영지 in 촬영지들:
             },headers={
                 "Authorization":token
             })
+            successList.append(촬영지)
 
         except:
             print("실패")
+
+print(작품명,"에 해당하는",len(successList),"개의 촬영지가 업데이트되었습니다.")
+print("아래는 db에 업로드한 촬영지 정보입니다.")
+print("==================================")
+for 촬영지정보 in successList:
+    print(촬영지정보)
