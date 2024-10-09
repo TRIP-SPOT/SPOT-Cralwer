@@ -61,16 +61,23 @@ region_Mapper={
     "세종특별자치시": "세종",
 }
 
+def getWork(object):
+    return object['name']
 
-f=open('work.csv','r')
-rdr=csv.reader(f)
+token=open('env.txt','r').readline()
+def getWorkName():
+    response=requests.get('http://www.spot-setjetter.kro.kr:8080/api/spot/work',headers={
+        "Authorization":token
+    })
+
+    sorted_data = sorted(response.json(), key=lambda x: x['id'], reverse=True)
+    return list(map(getWork,sorted_data))
+    
+
 [작품명배열, 촬영지들]=csv.reader(open('test.csv','r'))
-
-workMapper=[]
+workMapper=getWorkName()
 작품명=작품명배열[0]
 
-for line in rdr:
-    workMapper.append(line[3])
 
 
 def getSpotContentId(촬영지):
@@ -127,4 +134,19 @@ for 촬영지 in 촬영지들:
     if(contentId):
         spotInfo=getSpotInformation(contentId)
         result={"workname":작품명,"workId":workMapper.index(작품명),"lat":spotInfo["lat"], "long":spotInfo["long"], 'contentId':contentId, 'city':spotInfo['city'], 'region':spotInfo["region"]}
-        print(result)
+        
+        try:
+            response=requests.post('http://www.spot-setjetter.kro.kr:8080/api/spot',data={
+                'contentId':result['contentId'],
+                'name':촬영지,
+                'region':result['region'],
+                'city':result['city'],
+                'longitude':result['long'],
+                'latitude':result['lat'],
+                'workId':result['workId']
+            },headers={
+                "Authorization":token
+            })
+
+        except:
+            print("실패")
