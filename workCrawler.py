@@ -74,7 +74,7 @@ def getWorkName():
     return list(map(getWork,sorted_data))
     
 
-[작품명배열, 촬영지들]=csv.reader(open('test.csv','r'))
+[작품명배열, 촬영지들]=csv.reader(open('input.csv','r'))
 workMapper=getWorkName()
 작품명=작품명배열[0]
 
